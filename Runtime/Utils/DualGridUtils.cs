@@ -16,12 +16,14 @@ namespace skner.DualGrid.Utils
         /// <returns></returns>
         public static Vector3Int[] GetRenderTilePositions(Vector3Int dataTilePosition)
         {
+            var x = dataTilePosition.x;
+            var y = dataTilePosition.y;
             return new Vector3Int[]
             {
-                dataTilePosition + new Vector3Int(0, 0, 0),
-                dataTilePosition + new Vector3Int(1, 0, 0),
-                dataTilePosition + new Vector3Int(0, 1, 0),
-                dataTilePosition + new Vector3Int(1, 1, 0)
+                new (x, y),
+                new (x + 1, y),
+                new (x, y + 1),
+                new (x + 1, y + 1)
             };
         }
 
@@ -35,12 +37,14 @@ namespace skner.DualGrid.Utils
         /// <returns></returns>
         public static Vector3Int[] GetDataTilePositions(Vector3Int renderTilePosition)
         {
+            var x = renderTilePosition.x;
+            var y = renderTilePosition.y;
             return new Vector3Int[]
             {
-                renderTilePosition - new Vector3Int(0, 0, 0),
-                renderTilePosition - new Vector3Int(1, 0, 0),
-                renderTilePosition - new Vector3Int(0, 1, 0),
-                renderTilePosition - new Vector3Int(1, 1, 0)
+                new (x, y),
+                new (x - 1, y),
+                new (x, y - 1),
+                new (x - 1, y - 1)
             };
         }
 
