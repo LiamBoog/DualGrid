@@ -2,7 +2,8 @@
     "name": "skner.DualGrid",
     "rootNamespace": "skner.DualGrid",
     "references": [
-        "GUID:613783dc1674e844b87788ea74ede0f6"
+        "GUID:613783dc1674e844b87788ea74ede0f6",
+        "GUID:2665a8d13d1b3f18800f46e256720795"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

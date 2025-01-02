@@ -17,7 +17,9 @@ namespace skner.DualGrid.Editor
         
         static DualGridTilemapPersistentListener()
         {
+            Tilemap.tilemapTileChanged -= HandleTilemapChange;
             Tilemap.tilemapTileChanged += HandleTilemapChange;
+            SceneView.duringSceneGui -= OnSceneGUI;
             SceneView.duringSceneGui += OnSceneGUI;
         }
 
@@ -35,7 +37,7 @@ namespace skner.DualGrid.Editor
             {
                 foreach (var module in DualGridModules)
                 {
-                    module.SetEditorPreviewTiles();
+                    module.SetEditorPreviewTiles(GridPaintingState.lastSceneViewGridPosition);
                 }
                 return;
             }

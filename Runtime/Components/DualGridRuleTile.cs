@@ -77,7 +77,7 @@ namespace skner.DualGrid
 
             return true;
         }
-
+        
         /// <summary>
         /// Checks if the <paramref name="dataTilePosition"/> is filled in accordance with the defined <paramref name="rule"/>.
         /// </summary>

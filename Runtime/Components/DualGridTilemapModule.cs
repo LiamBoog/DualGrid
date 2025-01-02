@@ -1,6 +1,5 @@
 ﻿using skner.DualGrid.Extensions;
 using skner.DualGrid.Utils;
-using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -105,28 +104,22 @@ namespace skner.DualGrid
             }
         }
         
-        internal void SetEditorPreviewTiles()
+        internal void SetEditorPreviewTiles(Vector3Int dataTilePosition = default)
         {
             if (Tile == null)
             {
-                Debug.LogError($"Cannot refresh render tilemap, because tile is not set in dual grid module.", RenderTilemap);
+                Debug.LogError("Cannot refresh render tilemap, because tile is not set in dual grid module.", RenderTilemap);
                 return;
             }
             
 #if UNITY_EDITOR
             UnityEditor.Undo.RecordObject(RenderTilemap, "Refreshed editor preview render tiles");
 #endif
-            
-            RenderTilemap.ClearAllEditorPreviewTiles();
-            foreach (var position in DataTilemap.cellBounds.allPositionsWithin)
+
+            foreach (Vector3Int renderTilePosition in DualGridUtils.GetRenderTilePositions(dataTilePosition))
             {
-                if (DataTilemap.HasTile(position))
-                {
-                    foreach (Vector3Int renderTilePosition in DualGridUtils.GetRenderTilePositions(position))
-                    {
-                        RenderTilemap.SetEditorPreviewTile(renderTilePosition, Tile);
-                    }
-                }
+                RenderTilemap.SetEditorPreviewTile(renderTilePosition, null);
+                RenderTilemap.SetEditorPreviewTile(renderTilePosition, Tile);
             }
         }
 

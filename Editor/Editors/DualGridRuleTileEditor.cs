@@ -6,7 +6,6 @@ namespace skner.DualGrid.Editor
     [CustomEditor(typeof(DualGridRuleTile), true)]
     public class DualGridRuleTileEditor : RuleTileEditor
     {
-
         public override BoundsInt GetRuleGUIBounds(BoundsInt bounds, RuleTile.TilingRule rule)
         {
             return new BoundsInt(-1, -1, 0, 2, 2, 0);
