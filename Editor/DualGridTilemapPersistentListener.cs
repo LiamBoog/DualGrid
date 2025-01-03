@@ -19,8 +19,8 @@ namespace skner.DualGrid.Editor
         {
             Tilemap.tilemapTileChanged -= HandleTilemapChange;
             Tilemap.tilemapTileChanged += HandleTilemapChange;
-            SceneView.duringSceneGui -= OnSceneGUI;
-            SceneView.duringSceneGui += OnSceneGUI;
+            SceneView.duringSceneGui -= UpdateDualGridTilemapPreviewTiles;
+            SceneView.duringSceneGui += UpdateDualGridTilemapPreviewTiles;
         }
 
         private static void HandleTilemapChange(Tilemap tilemap, Tilemap.SyncTile[] tiles)
@@ -31,35 +31,19 @@ namespace skner.DualGrid.Editor
             }
         }
         
-        private static void OnSceneGUI(SceneView _)
+        private static void UpdateDualGridTilemapPreviewTiles(SceneView _)
         {
-            if (dragging)
-            {
-                foreach (var module in DualGridModules)
-                {
-                    module.SetEditorPreviewTiles(GridPaintingState.lastSceneViewGridPosition);
-                }
-                return;
-            }
-            
             Type activeToolType = ToolManager.activeToolType;
             if (activeToolType != typeof(PaintTool) && activeToolType != typeof(EraseTool))
                 return;
             
             Event currentEvent = Event.current;
-            if (!(currentEvent.type == EventType.MouseDown && currentEvent.button == 0))
+            if (!(currentEvent.type == EventType.MouseDown || (currentEvent.type == EventType.MouseDrag && currentEvent.button == 0)))
                 return;
 
-            SceneView.beforeSceneGui += OnUpdate;
-            dragging = true;
-            
-            void OnUpdate(SceneView _)
+            foreach (var module in DualGridModules)
             {
-                if (Event.current.type != EventType.MouseUp)
-                    return;
-                
-                SceneView.beforeSceneGui -= OnUpdate;
-                dragging = false;
+                module.UpdateEditorPreviewTiles(GridPaintingState.lastSceneViewGridPosition);
             }
         }
     }
