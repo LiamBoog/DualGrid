@@ -40,36 +40,57 @@ namespace skner.DualGrid.Editor
             
             // Only update preview tiles or click or drag
             Event currentEvent = Event.current;
-            if (!(currentEvent.type == EventType.MouseDown || (currentEvent.type == EventType.MouseDrag && currentEvent.button == 0)))
-                return;
-
-            foreach (var module in DualGridModules)
+            if (currentEvent.type == EventType.MouseDown)
             {
-                GridBrush brush = (GridBrush) GridPaintingState.gridBrush;
-                Vector3Int size = brush.size;
-                Vector3Int pivot = brush.pivot;
-                Vector3Int bottomLeft = new(Math.Min(-pivot.x, 0), Math.Min(-pivot.y, 0));
-                Vector3Int topRight = new(size.x - 1 - pivot.x, size.y - 1 - pivot.y);
-                Debug.DrawLine(module.DataTilemap.CellToWorld(GridPaintingState.lastSceneViewGridPosition + bottomLeft), module.DataTilemap.CellToWorld(GridPaintingState.lastSceneViewGridPosition + topRight), Color.red);
-                
-                HashSet<Vector3Int> affectedTiles = new();
-                for (int x = bottomLeft.x; x <= topRight.x; x++)
-                {
-                    for (int y = bottomLeft.y; y <= topRight.y; y++)
-                    {
-                        Vector3Int cell = GridPaintingState.lastSceneViewGridPosition + new Vector3Int(x, y);
-                        affectedTiles.UnionWith(DualGridUtils.GetRenderTilePositions(cell));
-                    }
-                }
-
-                if (size == Vector3Int.one)
-                {
-                    module.UpdateEditorPreviewTiles(GridPaintingState.lastSceneViewGridPosition);
-                    return;
-                }
-                
-                module.UpdateEditorPreviewTiles(affectedTiles);
+                // Update on MouseDown doesn't work, so we delay it
+                EditorApplication.delayCall += UpdatePreviewTiles;
+                return;
             }
+
+            if (currentEvent.type == EventType.MouseDrag && currentEvent.button == 0)
+            {
+                UpdatePreviewTiles();
+            }
+            
+            void UpdatePreviewTiles()
+            {
+                foreach (var module in DualGridModules)
+                {
+                    if (((GridBrush)GridPaintingState.gridBrush).size == Vector3Int.one)
+                    {
+                        module.UpdateEditorPreviewTiles(GridPaintingState.lastSceneViewGridPosition);
+                        continue;
+                    }
+                    
+                    module.UpdateEditorPreviewTiles(GetBrushAffectedRenderTilePositions());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get a set of unique render tile positions affected by the current grid brush.
+        /// </summary>
+        private static IEnumerable<Vector3Int> GetBrushAffectedRenderTilePositions()
+        {
+            GridBrush brush = (GridBrush) GridPaintingState.gridBrush;
+
+            Vector3Int size = brush.size;
+            Vector3Int pivot = brush.pivot;
+            Vector3Int bottomLeft = new(Math.Min(-pivot.x, 0), Math.Min(-pivot.y, 0));
+            Vector3Int topRight = new(size.x - 1 - pivot.x, size.y - 1 - pivot.y);
+                
+            HashSet<Vector3Int> output = new();
+            Vector3Int brushPosition = GridPaintingState.lastSceneViewGridPosition;
+            for (int x = bottomLeft.x; x <= topRight.x; x++)
+            {
+                for (int y = bottomLeft.y; y <= topRight.y; y++)
+                {
+                    Vector3Int cell = brushPosition + new Vector3Int(x, y);
+                    output.UnionWith(DualGridUtils.GetRenderTilePositions(cell));
+                }
+            }
+
+            return output;
         }
     }
 }
