@@ -104,7 +104,11 @@ namespace skner.DualGrid
             }
         }
         
-        internal void SetEditorPreviewTiles(Vector3Int dataTilePosition = default)
+        /// <summary>
+        /// Update the editor preview tiles in the <see cref="RenderTilemap"/> surrounding the specified <paramref name="dataTilePosition"/>.
+        /// </summary>
+        /// <param name="dataTilePosition">The grid position in <see cref="RenderTilemap"/> around which to update the preview tiles.</param>
+        internal void UpdateEditorPreviewTiles(Vector3Int dataTilePosition = default)
         {
             if (Tile == null)
             {

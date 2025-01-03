@@ -11,8 +11,6 @@ namespace skner.DualGrid.Editor
     [InitializeOnLoad]
     public static class DualGridTilemapPersistentListener
     {
-        private static bool dragging;
-        
         private static DualGridTilemapModule[] DualGridModules => Object.FindObjectsByType<DualGridTilemapModule>(FindObjectsSortMode.None);
         
         static DualGridTilemapPersistentListener()
@@ -33,10 +31,12 @@ namespace skner.DualGrid.Editor
         
         private static void UpdateDualGridTilemapPreviewTiles(SceneView _)
         {
+            // Only update preview tiles when painting or erasing
             Type activeToolType = ToolManager.activeToolType;
             if (activeToolType != typeof(PaintTool) && activeToolType != typeof(EraseTool))
                 return;
             
+            // Only update preview tiles or click or drag
             Event currentEvent = Event.current;
             if (!(currentEvent.type == EventType.MouseDown || (currentEvent.type == EventType.MouseDrag && currentEvent.button == 0)))
                 return;
