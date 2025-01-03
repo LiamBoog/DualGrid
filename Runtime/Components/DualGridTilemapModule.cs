@@ -1,4 +1,5 @@
-﻿using skner.DualGrid.Extensions;
+﻿using System.Collections.Generic;
+using skner.DualGrid.Extensions;
 using skner.DualGrid.Utils;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -105,10 +106,10 @@ namespace skner.DualGrid
         }
         
         /// <summary>
-        /// Update the editor preview tiles in the <see cref="RenderTilemap"/> surrounding the specified <paramref name="dataTilePosition"/>.
+        /// Update the editor preview tiles in the <see cref="RenderTilemap"/> at the specified <paramref name="renderTilePositions"/>.
         /// </summary>
-        /// <param name="dataTilePosition">The grid position in <see cref="RenderTilemap"/> around which to update the preview tiles.</param>
-        internal void UpdateEditorPreviewTiles(Vector3Int dataTilePosition = default)
+        /// <param name="renderTilePositions">The grid positions in <see cref="RenderTilemap"/> at which to update the preview tiles.</param>
+        internal void UpdateEditorPreviewTiles(IEnumerable<Vector3Int> renderTilePositions)
         {
             if (Tile == null)
             {
@@ -120,11 +121,20 @@ namespace skner.DualGrid
             UnityEditor.Undo.RecordObject(RenderTilemap, "Refreshed editor preview render tiles");
 #endif
 
-            foreach (Vector3Int renderTilePosition in DualGridUtils.GetRenderTilePositions(dataTilePosition))
+            foreach (Vector3Int renderTilePosition in renderTilePositions)
             {
                 RenderTilemap.SetEditorPreviewTile(renderTilePosition, null);
                 RenderTilemap.SetEditorPreviewTile(renderTilePosition, Tile);
             }
+        }
+        
+        /// <summary>
+        /// Update the editor preview tiles in the <see cref="RenderTilemap"/> surrounding the specified <paramref name="dataTilePosition"/>.
+        /// </summary>
+        /// <param name="dataTilePosition">The grid position in <see cref="RenderTilemap"/> around which to update the preview tiles.</param>
+        internal void UpdateEditorPreviewTiles(Vector3Int dataTilePosition = default)
+        {
+            UpdateEditorPreviewTiles(DualGridUtils.GetRenderTilePositions(dataTilePosition));
         }
 
         private void UpdateRenderTilemapFromDataTile(Vector3Int dataTilePosition)
