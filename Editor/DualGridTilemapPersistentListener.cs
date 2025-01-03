@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using skner.DualGrid.Utils;
 using UnityEditor;
 using UnityEditor.EditorTools;
 using UnityEditor.Tilemaps;
@@ -43,7 +45,30 @@ namespace skner.DualGrid.Editor
 
             foreach (var module in DualGridModules)
             {
-                module.UpdateEditorPreviewTiles(GridPaintingState.lastSceneViewGridPosition);
+                GridBrush brush = (GridBrush) GridPaintingState.gridBrush;
+                Vector3Int size = brush.size;
+                Vector3Int pivot = brush.pivot;
+                Vector3Int bottomLeft = new(Math.Min(-pivot.x, 0), Math.Min(-pivot.y, 0));
+                Vector3Int topRight = new(size.x - 1 - pivot.x, size.y - 1 - pivot.y);
+                Debug.DrawLine(module.DataTilemap.CellToWorld(GridPaintingState.lastSceneViewGridPosition + bottomLeft), module.DataTilemap.CellToWorld(GridPaintingState.lastSceneViewGridPosition + topRight), Color.red);
+                
+                HashSet<Vector3Int> affectedTiles = new();
+                for (int x = bottomLeft.x; x <= topRight.x; x++)
+                {
+                    for (int y = bottomLeft.y; y <= topRight.y; y++)
+                    {
+                        Vector3Int cell = GridPaintingState.lastSceneViewGridPosition + new Vector3Int(x, y);
+                        affectedTiles.UnionWith(DualGridUtils.GetRenderTilePositions(cell));
+                    }
+                }
+
+                if (size == Vector3Int.one)
+                {
+                    module.UpdateEditorPreviewTiles(GridPaintingState.lastSceneViewGridPosition);
+                    return;
+                }
+                
+                module.UpdateEditorPreviewTiles(affectedTiles);
             }
         }
     }
