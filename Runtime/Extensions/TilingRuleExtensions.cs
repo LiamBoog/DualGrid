@@ -23,5 +23,18 @@ namespace skner.DualGrid.Extensions
             if (neightborIndex == -1) throw new System.ArgumentException($"Could not find a valid neighbor for tile id {rule.m_Id} with the data tile offset of {dataTileOffset}.");
             return neightborIndex;
         }
+
+        public static BoundsInt GetBoundsDualGrid(this TilingRule rule)
+        {
+            BoundsInt bounds = new BoundsInt(Vector3Int.zero, Vector3Int.one);
+            foreach (var (position, _) in rule.GetNeighbors())
+            {
+                bounds.xMin = Mathf.Min(bounds.xMin, position.x);
+                bounds.yMin = Mathf.Min(bounds.yMin, position.y);
+                bounds.xMax = Mathf.Max(bounds.xMax, position.x);
+                bounds.yMax = Mathf.Max(bounds.yMax, position.y);
+            }
+            return bounds;
+        }
     }
 }
