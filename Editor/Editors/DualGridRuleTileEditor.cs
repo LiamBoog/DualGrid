@@ -1,6 +1,6 @@
-using System.Collections.Generic;
-using skner.DualGrid.Extensions;
+using System.Reflection;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace skner.DualGrid.Editor
@@ -8,24 +8,35 @@ namespace skner.DualGrid.Editor
     [CustomEditor(typeof(DualGridRuleTile), true)]
     public class DualGridRuleTileEditor : RuleTileEditor
     {
+        private static class Styles
+        {
+            public static GUIContent tilingRules = 
+                (GUIContent) typeof(RuleTileEditor).
+                    Assembly.
+                    GetType($"{typeof(RuleTileEditor).FullName}+{nameof(Styles)}").
+                    GetField(nameof(tilingRules))!.GetValue(null); 
+        }
+        
+        private ReorderableList m_ReorderableList;
+        
+        public override void OnEnable()
+        {
+            base.OnEnable();
+
+            // Don't show 'Extend Neighbors' toggle 
+            m_ReorderableList = (ReorderableList) typeof(RuleTileEditor).GetField(nameof(m_ReorderableList), BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(this);
+            m_ReorderableList.drawHeaderCallback = OnDrawHeader;
+
+            extendNeighbor = false;
+        }
+        
+        public void OnDrawHeader(Rect rect)
+        {
+            GUI.Label(rect, Styles.tilingRules);
+        }
+        
         public override BoundsInt GetRuleGUIBounds(BoundsInt bounds, RuleTile.TilingRule rule)
         {
-            bounds = rule.GetBoundsDualGrid();
-            if (extendNeighbor)
-            {
-                bounds.xMin--;
-                bounds.yMin--;
-                bounds.xMax++;
-                bounds.yMax++;
-            }
-            
-            bounds.xMin = Mathf.Min(bounds.xMin, -1);
-            bounds.yMin = Mathf.Min(bounds.yMin, -1);
-            bounds.xMax = Mathf.Max(bounds.xMax, 1);
-            bounds.yMax = Mathf.Max(bounds.yMax, 1);
-
-            //Debug.Log((bounds, new BoundsInt(-1, -1, 0, 2, 2, 0)));
-            return bounds;
             return new BoundsInt(-1, -1, 0, 2, 2, 0);
         }
 
@@ -58,43 +69,17 @@ namespace skner.DualGrid.Editor
 
             var neighbors = tilingRule.GetNeighbors();
 
-            // TODO - Update this to allow expanded neighbours
             // Incremented for cycles by 1 to workaround new GetBounds(), while perserving corner behaviour
-            List<Vector3Int> positions = new();
-            //Debug.Log(((bounds.yMin, bounds.yMax), (bounds.yMin, bounds.yMax)));
             for (int y = bounds.yMin; y < bounds.yMax; y++)
             {
-                /*if (y == 0)
-                    continue;*/
-                
                 for (int x = bounds.xMin; x < bounds.xMax; x++)
                 {
-                    /*if (x == 0)
-                        continue;*/
-                    
                     // Pos changed here to workaround for the new 2x2 matrix, only considering the corners, while not changing the Rect r
                     Vector3Int pos = new Vector3Int(x >= 0 ? x + 1 : x, y >= 0 ? y + 1 : y, 0);
-                    //Vector3Int pos = new Vector3Int(x, y, 0);
-                    positions.Add(pos);
 
                     Rect r = new Rect(rect.xMin + (x - bounds.xMin) * w, rect.yMin + (-y + bounds.yMax - 1) * h, w - 1, h - 1);
                     RuleMatrixIconOnGUI(tilingRule, neighbors, pos, r);
                 }
-            }
-            
-            //Debug.Log(string.Join(", ", positions));
-        }
-
-        public override void RuleOnGUI(Rect rect, Vector3Int position, int neighbor)
-        {
-            switch (neighbor)
-            {
-                case DualGridRuleTile.DualGridNeighbor.Filled:
-                    GUI.DrawTexture(rect, arrows[GetArrowIndex(position)]);
-                    break;
-                case DualGridRuleTile.DualGridNeighbor.NotFilled:
-                    GUI.DrawTexture(rect, arrows[9]);
-                    break;
             }
         }
     }
