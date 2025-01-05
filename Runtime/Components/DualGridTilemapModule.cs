@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using skner.DualGrid.Extensions;
 using skner.DualGrid.Utils;
 using UnityEngine;
@@ -124,8 +125,34 @@ namespace skner.DualGrid
             foreach (Vector3Int renderTilePosition in renderTilePositions)
             {
                 RenderTilemap.SetEditorPreviewTile(renderTilePosition, null);
+                bool match = TileHasMatches(renderTilePosition);
+                //RenderTilemap.RefreshTile(renderTilePosition);
+                Debug.Log((DualGridUtils.GetDataTilePositions(renderTilePosition).Any(p => DataTilemap.HasTile(p)), TileHasMatches(renderTilePosition)));
+                match = !TileHasMatches(renderTilePosition) && !DualGridUtils.GetDataTilePositions(renderTilePosition).Any(p => DataTilemap.HasTile(p));
+                if (match)
+                {
+                    Debug.DrawLine(Vector3.zero, RenderTilemap.CellToWorld(renderTilePosition) + 0.5f * RenderTilemap.cellSize, Color.red, 1f);
+                    Debug.Log(RenderTilemap.GetEditorPreviewSprite(renderTilePosition));
+                    continue;
+                }
+                
                 RenderTilemap.SetEditorPreviewTile(renderTilePosition, Tile);
             }
+        }
+
+        private bool TileHasMatches(Vector3Int renderTilePosition)
+        {
+            bool output = false;
+            if (RenderTilemap.GetTile(renderTilePosition) is DualGridRuleTile ruleTile)
+            {
+                foreach (RuleTile.TilingRule rule in ruleTile.m_TilingRules)
+                {
+                    Matrix4x4 identity = Matrix4x4.identity;
+                    output |= ruleTile.RuleMatches(rule, renderTilePosition, DataTilemap, ref identity);
+                }
+            }
+
+            return output;
         }
         
         /// <summary>
