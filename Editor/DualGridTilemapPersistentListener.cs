@@ -21,8 +21,10 @@ namespace skner.DualGrid.Editor
             Tilemap.tilemapTileChanged += HandleTilemapChange;
             SceneView.duringSceneGui -= UpdateDualGridTilemapPreviewTiles;
             SceneView.duringSceneGui += UpdateDualGridTilemapPreviewTiles;
-            SceneView.duringSceneGui -= RefreshTilemaps;
-            SceneView.duringSceneGui += RefreshTilemaps;
+            SceneView.duringSceneGui -= OnMouseEnterExitWindow;
+            SceneView.duringSceneGui += OnMouseEnterExitWindow;
+            
+            RefreshRenderTiles();
         }
 
         private static void HandleTilemapChange(Tilemap tilemap, Tilemap.SyncTile[] tiles)
@@ -58,7 +60,7 @@ namespace skner.DualGrid.Editor
             {
                 foreach (var module in DualGridModules)
                 {
-                    if (((GridBrush)GridPaintingState.gridBrush).size == Vector3Int.one)
+                    if (((GridBrush) GridPaintingState.gridBrush).size == Vector3Int.one)
                     {
                         module.UpdateEditorPreviewTiles(GridPaintingState.lastSceneViewGridPosition);
                         continue;
@@ -95,12 +97,17 @@ namespace skner.DualGrid.Editor
             return output;
         }
 
-        private static void RefreshTilemaps(SceneView _)
+        private static void OnMouseEnterExitWindow(SceneView _)
         {
             EventType currentEventType = Event.current.type;
             if (currentEventType != EventType.MouseEnterWindow && currentEventType != EventType.MouseLeaveWindow)
                 return;
-
+            
+            RefreshRenderTiles();
+        }
+        
+        private static void RefreshRenderTiles()
+        {
             foreach (var module in DualGridModules)
             {
                 module.RefreshRenderTiles();

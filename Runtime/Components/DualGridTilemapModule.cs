@@ -119,7 +119,7 @@ namespace skner.DualGrid
             }
             
 #if UNITY_EDITOR
-            UnityEditor.Undo.RecordObject(RenderTilemap, "Refreshed editor preview render tiles");
+            UnityEditor.Undo.RecordObject(RenderTilemap, "Updated editor preview render tiles");
 #endif
 
             foreach (Vector3Int renderTilePosition in renderTilePositions)
