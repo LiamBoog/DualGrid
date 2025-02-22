@@ -75,9 +75,9 @@ namespace skner.DualGrid
                 }
 #if UNITY_EDITOR
                 UnityEditor.Undo.RecordObject(RenderTilemap, $"Updated {tileChanges.Length} render tile(s)");
-#endif
 
                 RenderTilemap.ClearAllEditorPreviewTiles();
+#endif
                 foreach (Tilemap.SyncTile tileChange in tileChanges)
                 {
                     UpdateRenderTilemapFromDataTile(tileChange.position);
@@ -120,13 +120,13 @@ namespace skner.DualGrid
             
 #if UNITY_EDITOR
             UnityEditor.Undo.RecordObject(RenderTilemap, "Updated editor preview render tiles");
-#endif
 
             foreach (Vector3Int renderTilePosition in renderTilePositions)
             {
                 RenderTilemap.SetEditorPreviewTile(renderTilePosition, null);
                 RenderTilemap.SetEditorPreviewTile(renderTilePosition, Tile);
             }
+#endif
         }
         
         /// <summary>
