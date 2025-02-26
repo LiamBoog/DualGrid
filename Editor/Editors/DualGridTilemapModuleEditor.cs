@@ -1,4 +1,4 @@
-using skner.DualGrid.Editor.Extensions;
+﻿using skner.DualGrid.Editor.Extensions;
 using skner.DualGrid.Utils;
 using System.Collections.Generic;
 using System.Linq;
