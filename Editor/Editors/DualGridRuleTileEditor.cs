@@ -13,6 +13,20 @@ namespace skner.DualGrid.Editor
     [CustomEditor(typeof(DualGridRuleTile), true)]
     public class DualGridRuleTileEditor : RuleTileEditor
     {
+        private static class Styles
+        {
+            public static GUIContent tilingRules = 
+                (GUIContent) typeof(RuleTileEditor).
+                    Assembly.
+                    GetType($"{typeof(RuleTileEditor).FullName}+{nameof(Styles)}").
+                    GetField(nameof(tilingRules))!.GetValue(null); 
+        }
+        
+        private ReorderableList m_ReorderableList;
+        
+        public override void OnEnable()
+        {
+            base.OnEnable();
 
         private static class Styles
         {
@@ -110,12 +124,12 @@ namespace skner.DualGrid.Editor
             var neighbors = tilingRule.GetNeighbors();
 
             // Incremented for cycles by 1 to workaround new GetBounds(), while perserving corner behaviour
-            for (int y = -1; y < 1; y++)
+            for (int y = bounds.yMin; y < bounds.yMax; y++)
             {
-                for (int x = -1; x < 1; x++)
+                for (int x = bounds.xMin; x < bounds.xMax; x++)
                 {
                     // Pos changed here to workaround for the new 2x2 matrix, only considering the corners, while not changing the Rect r
-                    Vector3Int pos = new Vector3Int(x == 0 ? 1 : x, y == 0 ? 1 : y, 0);
+                    Vector3Int pos = new Vector3Int(x >= 0 ? x + 1 : x, y >= 0 ? y + 1 : y, 0);
 
                     Rect r = new Rect(rect.xMin + (x - bounds.xMin) * w, rect.yMin + (-y + bounds.yMax - 1) * h, w - 1, h - 1);
                     RuleMatrixIconOnGUI(tilingRule, neighbors, pos, r);

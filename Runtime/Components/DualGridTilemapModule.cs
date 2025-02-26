@@ -1,4 +1,6 @@
-﻿using skner.DualGrid.Extensions;
+using System.Collections.Generic;
+using System.Linq;
+using skner.DualGrid.Extensions;
 using skner.DualGrid.Utils;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -112,6 +114,21 @@ namespace skner.DualGrid
                 }
             }
         }
+        
+        /// <summary>
+        /// Update the editor preview tiles in the <see cref="RenderTilemap"/> at the specified <paramref name="renderTilePositions"/>.
+        /// </summary>
+        /// <param name="renderTilePositions">The grid positions in <see cref="RenderTilemap"/> at which to update the preview tiles.</param>
+        internal void UpdateEditorPreviewTiles(IEnumerable<Vector3Int> renderTilePositions)
+        {
+            if (Tile == null)
+            {
+                Debug.LogError("Cannot refresh render tilemap, because tile is not set in dual grid module.", RenderTilemap);
+                return;
+            }
+            
+#if UNITY_EDITOR
+            UnityEditor.Undo.RecordObject(RenderTilemap, "Updated editor preview render tiles");
 
         public virtual void RefreshRenderTiles(Vector3Int dataTilePosition)
         {
